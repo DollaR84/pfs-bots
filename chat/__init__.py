@@ -7,5 +7,5 @@ created on 12.10.2021
 
 """
 
-from chat.handlers import chat_init, chat_close
+from chat.handlers import chat_init
 from chat.handlers import chat_start, chat_communicate, chat_finish

@@ -28,22 +28,21 @@ from languages import local
 
 async def show_catalog(message: types.Message, state: FSMContext):
     total = await get_count_events()
-    offset = 0
-    step = 2
-    events = await read_events_from_db(offset, step)
-    async with state.proxy() as data:
-        data['total'] = total
-        data['offset'] = offset + step
-    await show_events(message, state, events, message.from_user.id)
+    if 0 == total:
+        await message.answer(local('phrases', 'events_empty'), parse_mode="HTML")
+    else:
+        offset = 0
+        step = 2
+        events = await read_events_from_db(offset, step)
+        async with state.proxy() as data:
+            data['total'] = total
+            data['offset'] = offset + step
+        await show_events(message, state, events, message.from_user.id)
 
 
 async def show_event(message, event, kb=None):
-    await ag.bot.send_photo(message.chat.id, event.media)
-    await message.answer(event.title, parse_mode="HTML")
-    if kb:
-        await message.answer(event.description, reply_markup=kb, parse_mode="HTML")
-    else:
-        await message.answer(event.description, parse_mode="HTML")
+    text = '\n'.join([event.title, event.description])
+    await ag.bot.send_photo(message.chat.id, event.media, caption=text, reply_markup=kb, parse_mode="HTML")
 
 
 async def show_events(message: types.Message, state: FSMContext, events, user_id):
@@ -74,7 +73,7 @@ async def create_event(message: types.Message):
 
 @ag.dp.message_handler(state=CreateEvent.start, content_types=types.ContentTypes.TEXT)
 async def create_event_start(message: types.Message, state: FSMContext):
-    await message.answer(local('phrases', 'add_name'))
+    await message.answer(local('phrases', 'add_name'), parse_mode="HTML")
     await CreateEvent.next()
 
 
@@ -83,7 +82,7 @@ async def create_event_name(message: types.Message, state: FSMContext):
     if message.text == '':
         return
     await state.update_data(event_name=message.text)
-    await message.answer(local('phrases', 'add_title'))
+    await message.answer(local('phrases', 'add_title'), parse_mode="HTML")
     await CreateEvent.next()
 
 
@@ -92,7 +91,7 @@ async def create_event_title(message: types.Message, state: FSMContext):
     if message.text == '':
         return
     await state.update_data(event_title=message.text)
-    await message.answer(local('phrases', 'add_description'))
+    await message.answer(local('phrases', 'add_description'), parse_mode="HTML")
     await CreateEvent.next()
 
 
@@ -101,7 +100,7 @@ async def create_event_description(message: types.Message, state: FSMContext):
     if message.text == '':
         return
     await state.update_data(event_description=message.text)
-    await message.answer(local('phrases', 'add_media'))
+    await message.answer(local('phrases', 'add_media'), parse_mode="HTML")
     await CreateEvent.next()
 
 
@@ -136,12 +135,9 @@ async def create_event_expiry(message: types.Message, state: FSMContext):
 @ag.dp.message_handler(state=CreateEvent.finish, content_types=types.ContentTypes.TEXT)
 async def create_event_finish(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    await write_event_to_db(data)
-    await ag.bot.send_photo(message.chat.id, data['event_media'])
-    await message.answer(data['event_title'])
-    await message.answer(data['event_description'])
-    await message.answer(local('phrases', 'finish_create_event1'))
-    await message.answer(local('phrases', 'finish_create_event2'))
+    event = await write_event_to_db(data)
+    await show_event(message, event)
+    await message.answer(local('phrases', 'finish_create_event'), parse_mode="HTML")
     await state.finish()
 
 
@@ -152,7 +148,7 @@ async def process_callback_btn_create_event_state(callback_query: types.Callback
         await CreateEvent.next()
         await create_event_finish(callback_query.message, state)
     elif 'btn_cancel' == callback_query.data:
-        await callback_query.message.answer(local('phrases', 'create_event_cancel'))
+        await callback_query.message.answer(local('phrases', 'create_event_cancel'), parse_mode="HTML")
         await state.finish()
 
 
@@ -174,7 +170,7 @@ async def process_callback_btn_event(callback_query: types.CallbackQuery, state:
         await chat_init(callback_query.message, callback_query.from_user.id, event)
     elif 'btn_delete' == btn:
         kb = await get_keyboard(['yes', 'no'], index)
-        await callback_query.message.answer(local('phrases', 'del_question'), reply_markup=kb)
+        await callback_query.message.answer(local('phrases', 'del_question'), reply_markup=kb, parse_mode="HTML")
 
 
 @ag.dp.callback_query_handler(lambda c: c.data.startswith('btn_yes') or c.data.startswith('btn_no'))
@@ -183,6 +179,6 @@ async def process_callback_btn_comfirm(callback_query: types.CallbackQuery, stat
     index = int(index)
     if 'btn_yes' == btn:
         await delete_event_from_db(index)
-        await callback_query.message.answer(local('phrases', 'del_ok'))
+        await callback_query.message.answer(local('phrases', 'del_ok'), parse_mode="HTML")
     elif 'btn_no' == btn:
-        await callback_query.message.answer(local('phrases', 'del_cancel'))
+        await callback_query.message.answer(local('phrases', 'del_cancel'), parse_mode="HTML")

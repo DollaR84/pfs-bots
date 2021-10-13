@@ -58,6 +58,7 @@ async def write_event_to_db(data):
     event = Event(owner_id=user.id, name=data['event_name'], title=data['event_title'], description=data['event_description'], media=data['event_media'], expiry=data['date_expiry'])
     session.add(event)
     session.commit()
+    return event
 
 
 async def delete_event_from_db(index):

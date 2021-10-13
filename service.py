@@ -18,7 +18,7 @@ from config import Config as cfg
 from base import Agent as ag
 ag.token = cfg.API_TOKEN_SERVICE
 
-from chat import chat_init, chat_close
+from chat import chat_init
 from chat import chat_start, chat_communicate, chat_finish
 
 from database import Database
@@ -49,14 +49,6 @@ async def process_callback_btn_event(callback_query: types.CallbackQuery, state:
     if 'btn_answer' == btn:
         event = await read_event_from_db(index)
         await chat_init(callback_query.message, callback_query.from_user.id, event, callback_query.from_user.username)
-
-
-@ag.dp.message_handler(content_types=types.ContentTypes.ANY)
-async def cmd_menu(message: types.Message, state: FSMContext):
-    if message.text.startswith(local('btn', 'close_chat')):
-        await chat_close(message, state)
-        await message.answer(local('phrases', 'chat_close_name').format(user_full_name=message.from_user.username), reply_markup=types.ReplyKeyboardRemove())
-    await message.delete()
 
 
 def main():
