@@ -33,7 +33,7 @@ async def get_chat_answer_name_keyboard(name: str, event_name: str, event_id):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(
         types.InlineKeyboardButton(local('btn', 'answer_name').format(user_full_name=name), callback_data=f'btn_answer={event_id}'),
-        types.InlineKeyboardButton(text=local('btn', 'show_event_name').format(event_name=event_name), url=f"https://t.me/PfsDRIBot?start=show_event")
+        types.InlineKeyboardButton(text=local('btn', 'show_event_name').format(event_name=event_name), url=f"https://t.me/PfsDRIBot?start={event_id}-show_event")
     )
     return keyboard
 

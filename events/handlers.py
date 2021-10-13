@@ -41,6 +41,8 @@ async def show_catalog(message: types.Message, state: FSMContext):
 
 
 async def show_event(message, event, kb=None):
+    if isinstance(event, int):
+        event = await read_event_from_db(event)
     text = '\n'.join([event.title, event.description])
     await ag.bot.send_photo(message.chat.id, event.media, caption=text, reply_markup=kb, parse_mode="HTML")
 

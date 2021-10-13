@@ -73,11 +73,16 @@ async def chat_finish(message: types.Message, state: FSMContext):
 
 async def check_buttons(message: types.Message, state: FSMContext):
     result = False
-    if (local('btn', 'show_event') == message.text) or message.text.endswith('show_event'):
+    if local('btn', 'show_event') == message.text:
         from events import show_event
         result = True
         async with state.proxy() as data:
             await show_event(message, data['event'])
+    elif message.text.endswith('show_event'):
+        from events import show_event
+        result = True
+        index = int(message.text.split(' ')[1].split('-')[0])
+        await show_event(message, index)
     elif message.text.startswith(local('btn', 'close_chat')):
         await chat_close(message, state)
         result = True
