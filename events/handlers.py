@@ -37,13 +37,13 @@ async def show_catalog(message: types.Message, state: FSMContext):
     await show_events(message, state, events, message.from_user.id)
 
 
-async def show_event(chat_id, event, kb=None):
-    await ag.bot.send_photo(chat_id, event.media)
-    await ag.bot.send_message(chat_id, event.title)
+async def show_event(message, event, kb=None):
+    await ag.bot.send_photo(message.chat.id, event.media)
+    await message.answer(event.title)
     if kb:
-        await ag.bot.send_message(chat_id, event.description, reply_markup=kb, parse_mode="HTML")
+        await message.answer(event.description, reply_markup=kb, parse_mode="HTML")
     else:
-        await ag.bot.send_message(chat_id, event.description)
+        await message.answer(event.description)
 
 
 async def show_events(message: types.Message, state: FSMContext, events, user_id):
@@ -52,7 +52,7 @@ async def show_events(message: types.Message, state: FSMContext, events, user_id
             kb = await get_keyboard(['connect', 'delete'], event.id)
         else:
             kb = await get_keyboard(['connect'], event.id)
-        await show_event(message.chat.id, event, kb)
+        await show_event(message, event, kb)
     async with state.proxy() as data:
         if data['offset'] < data['total']:
             kb = await get_keyboard(['+1', '+5'])

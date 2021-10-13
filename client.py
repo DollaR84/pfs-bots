@@ -24,6 +24,7 @@ from chat import chat_start, chat_communicate, chat_finish
 from database import Database
 
 from events import EventBaseModel
+from events import read_event_from_db
 from events import show_catalog, show_event, create_event
 from events import create_event_start, create_event_name, create_event_title, create_event_description, create_event_media, create_event_expiry, create_event_finish
 from events import process_callback_btn_create_event_state, process_callback_btn_event
@@ -38,7 +39,12 @@ async def cmd_start(message: types.Message):
     if message.from_user.username is not None:
         user_full_name = message.from_user.username
     menu_keyboard = await get_menu_keyboard()
-    await message.answer(local('phrases', 'start').format(user_full_name=user_full_name), reply_markup=menu_keyboard, parse_mode="HTML")
+    msg_split = message.text.split()
+    if len(msg_split) == 2:
+        event = await read_event_from_db(int(msg_split[1]))
+        await show_event(message, event)
+    else:
+        await message.answer(local('phrases', 'start').format(user_full_name=user_full_name), reply_markup=menu_keyboard, parse_mode="HTML")
 
 
 @ag.dp.message_handler(commands=['about'])
