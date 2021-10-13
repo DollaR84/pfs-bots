@@ -39,11 +39,11 @@ async def show_catalog(message: types.Message, state: FSMContext):
 
 async def show_event(message, event, kb=None):
     await ag.bot.send_photo(message.chat.id, event.media)
-    await message.answer(event.title)
+    await message.answer(event.title, parse_mode="HTML")
     if kb:
         await message.answer(event.description, reply_markup=kb, parse_mode="HTML")
     else:
-        await message.answer(event.description)
+        await message.answer(event.description, parse_mode="HTML")
 
 
 async def show_events(message: types.Message, state: FSMContext, events, user_id):
