@@ -21,6 +21,11 @@ ag.token = cfg.API_TOKEN_SERVICE
 from chat import chat_init, chat_close
 from chat import chat_start, chat_communicate, chat_finish
 
+from database import Database
+
+from events import read_event_from_db
+from events import EventBaseModel
+
 from languages import local, load_language
 
 
@@ -56,6 +61,7 @@ async def cmd_menu(message: types.Message, state: FSMContext):
 
 def main():
     load_language(cfg.lang)
+    ag.db = Database(EventBaseModel)
     executor.start_polling(ag.dp, skip_updates=True)
 
 
