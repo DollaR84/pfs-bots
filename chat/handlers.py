@@ -99,25 +99,22 @@ async def check_buttons(message: types.Message, state: FSMContext):
 
 
 async def send_message(chat_id, text, kb, message):
-    if message.content_type == types.ContentTypes.TEXT:
-        await ag.bot.send_message(chat_id, text, reply_markup=kb)
-    else:
-        await ag.bot.send_message(chat_id, text)
-        if message.content_type == types.ContentTypes.PHOTO:
-            await ag.bot.send_photo(chat_id, message.photo[-1].file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.VIDEO:
-            await ag.bot.send_video(chat_id, message.video.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.AUDIO:
-            await ag.bot.send_audio(chat_id, message.audio.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.VOICE:
-            await ag.bot.send_voice(chat_id, message.voice.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.DOCUMENT:
-            await ag.bot.send_document(chat_id, message.document.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.CONTACT:
-            await ag.bot.send_contact(chat_id, message.contact.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.LOCATION:
-            await ag.bot.send_location(chat_id, message.location.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.ANIMATION:
-            await ag.bot.send_animation(chat_id, message.animation.file_unique_id, reply_markup=kb)
-        elif message.content_type == types.ContentTypes.STICKER:
-            await ag.bot.send_sticker(chat_id, message.sticker.file_unique_id, reply_markup=kb)
+    await ag.bot.send_message(chat_id, text, reply_markup=kb)
+    if message.content_type == types.ContentTypes.PHOTO:
+        await ag.bot.send_photo(chat_id, message.photo[-1].file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.VIDEO:
+        await ag.bot.send_video(chat_id, message.video.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.AUDIO:
+        await ag.bot.send_audio(chat_id, message.audio.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.VOICE:
+        await ag.bot.send_voice(chat_id, message.voice.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.DOCUMENT:
+        await ag.bot.send_document(chat_id, message.document.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.CONTACT:
+        await ag.bot.send_contact(chat_id, message.contact.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.LOCATION:
+        await ag.bot.send_location(chat_id, message.location.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.ANIMATION:
+        await ag.bot.send_animation(chat_id, message.animation.file_unique_id, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.STICKER:
+        await ag.bot.send_sticker(chat_id, message.sticker.file_unique_id, reply_markup=kb)
