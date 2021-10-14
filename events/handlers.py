@@ -116,7 +116,7 @@ async def create_event_media(message: types.Message, state: FSMContext):
     press_btn = await check_buttons(message, state)
     if press_btn or (not message.photo):
         return
-    await state.update_data(event_media=message.photo[0].file_id)
+    await state.update_data(event_media=message.photo[-1].file_id)
     kb = await get_events_inline_keyboard(['empty'])
     await message.answer(local('phrases', 'date_expiry'), reply_markup=kb, parse_mode="HTML")
     await CreateEvent.next()
@@ -195,6 +195,8 @@ async def process_callback_btn_comfirm(callback_query: types.CallbackQuery, stat
 
 async def check_buttons(message: types.Message, state: FSMContext):
     result = False
+    if not message.text:
+        return result
     if local('btn', 'cancel') == message.text:
         kb = await get_menu_keyboard()
         await message.answer(local('phrases', 'create_event_cancel'), reply_markup=kb, parse_mode="HTML")
