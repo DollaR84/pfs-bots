@@ -57,7 +57,7 @@ async def chat_communicate(message: types.Message, state: FSMContext):
         return
     token = get_another_token(ag.token)
     client = is_client_bot(ag.token)
-    message.text = message.text if message.text else ''
+    text = message.text if message.text else ''
     async with state.proxy() as data:
         with ag.bot.with_token(token):
             if client:
@@ -99,8 +99,9 @@ async def check_buttons(message: types.Message, state: FSMContext):
 
 
 async def send_message(chat_id, text, kb, message):
-    await ag.bot.send_message(chat_id, text, reply_markup=kb)
-    if message.content_type == types.ContentTypes.PHOTO:
+    if message.content_type == types.ContentTypes.TEXT:
+        await ag.bot.send_message(chat_id, text, reply_markup=kb)
+    elif message.content_type == types.ContentTypes.PHOTO:
         await ag.bot.send_photo(chat_id, message.photo[-1].file_unique_id, reply_markup=kb)
     elif message.content_type == types.ContentTypes.VIDEO:
         await ag.bot.send_video(chat_id, message.video.file_unique_id, reply_markup=kb)
