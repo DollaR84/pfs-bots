@@ -42,13 +42,13 @@ async def cmd_about(message: types.Message):
     await message.answer(local('about', 'author'), parse_mode="HTML")
 
 
-@ag.dp.callback_query_handler(lambda c: c.data.startswith('btn_answer'))
+@ag.dp.callback_query_handler(lambda c: c.data.startswith('btn_answer'), state=['*'])
 async def process_callback_btn_event(callback_query: types.CallbackQuery, state: FSMContext):
-    btn, index = callback_query.data.split('=')
-    index = int(index)
+    btn, params = callback_query.data.split('=')
+    user_id, username, event_id = params.split(':')
     if 'btn_answer' == btn:
-        event = await read_event_from_db(index)
-        await chat_init(callback_query.message, callback_query.from_user.id, event, callback_query.from_user.username)
+        event = await read_event_from_db(int(event_id))
+        await chat_init(callback_query.message, callback_query.from_user.id, user_id, username, event)
 
 
 def main():

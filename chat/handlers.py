@@ -24,9 +24,10 @@ from kb import get_menu_keyboard
 from languages import local
 
 
-async def chat_init(message, user_id, event, username=None):
+async def chat_init(message, owner_id, user_id, username, event):
     await Chating.start.set()
-    state = ag.dp.current_state(user=user_id)
+    state = ag.dp.current_state(user=owner_id)
+    await state.update_data(user_id=user_id)
     await state.update_data(username=username)
     await state.update_data(event=event)
     await chat_start(message, state)
@@ -59,11 +60,11 @@ async def chat_communicate(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         with ag.bot.with_token(token):
             if client:
-                kb = await get_chat_answer_name_keyboard(message.from_user.username, data['event'].name, data['event'].event_id)
+                kb = await get_chat_answer_name_keyboard(message.from_user.id, message.from_user.username, data['event'].name, data['event'].event_id)
                 await ag.bot.send_message(data['event'].owner_id, local('phrases', 'chat_client_write').format(event_title=data['event'].title, user_full_name=message.from_user.username, text=message.text), reply_markup=kb)
             else:
-                kb = await get_chat_answer_keyboard(data['event'].owner_id)
-                await ag.bot.send_message(message.from_user.id, local('phrases', 'chat_service_write').format(event_name=data['event'].name, text=message.text), reply_markup=kb)
+                kb = await get_chat_answer_keyboard(data['event'].owner_id, data['event'].event_id)
+                await ag.bot.send_message(data['user_id'], local('phrases', 'chat_service_write').format(event_name=data['event'].name, text=message.text), reply_markup=kb)
 
 
 @ag.dp.message_handler(state=Chating.finish, content_types=types.ContentTypes.ANY)
@@ -81,7 +82,7 @@ async def check_buttons(message: types.Message, state: FSMContext):
     elif message.text.endswith('show_event'):
         from events import show_event
         result = True
-        index = int(message.text.split(' ')[1].split('-')[0])
+        index = int(message.text.split(' ')[1].split(':')[0])
         await show_event(message, index)
     elif message.text.startswith(local('btn', 'close_chat')):
         await chat_close(message, state)

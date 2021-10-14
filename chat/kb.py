@@ -29,19 +29,19 @@ async def get_chat_menu_name_keyboard(name: str):
     return menu_keyboard
 
 
-async def get_chat_answer_name_keyboard(name: str, event_name: str, event_id):
+async def get_chat_answer_name_keyboard(user_id, name: str, event_name: str, event_id):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(
-        types.InlineKeyboardButton(local('btn', 'answer_name').format(user_full_name=name), callback_data=f'btn_answer={event_id}'),
-        types.InlineKeyboardButton(text=local('btn', 'show_event_name').format(event_name=event_name), url=f"https://t.me/PfsDRIBot?start={event_id}-show_event")
+        types.InlineKeyboardButton(local('btn', 'answer_name').format(user_full_name=name), callback_data=f'btn_answer={user_id}:{name}:{event_id}'),
+        types.InlineKeyboardButton(text=local('btn', 'show_event_name').format(event_name=event_name), url=f"https://t.me/PfsDRIBot?start={event_id}:show_event")
     )
     return keyboard
 
 
-async def get_chat_answer_keyboard(user_id):
+async def get_chat_answer_keyboard(user_id, event_id):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(
-        types.InlineKeyboardButton(local('btn', 'answer'), callback_data=f'btn_answer={user_id}'),
+        types.InlineKeyboardButton(local('btn', 'answer'), callback_data=f'btn_answer={user_id}:{event_id}'),
         types.InlineKeyboardButton(local('btn', 'show_event'), callback_data='btn_show_event')
     )
     return keyboard

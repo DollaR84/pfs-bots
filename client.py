@@ -18,11 +18,13 @@ from config import Config as cfg
 from base import Agent as ag
 ag.token = cfg.API_TOKEN_CLIENT
 
+from chat import chat_init
 from chat import chat_start, chat_communicate, chat_finish
 
 from database import Database
 
 from events import EventBaseModel
+from events import read_event_from_db
 from events import show_catalog, create_event
 from events import create_event_start, create_event_name, create_event_title, create_event_description, create_event_media, create_event_expiry, create_event_finish
 from events import process_callback_btn_create_event_state, process_callback_btn_event
@@ -45,6 +47,15 @@ async def cmd_start(message: types.Message):
 @ag.dp.message_handler(commands=['about'])
 async def cmd_about(message: types.Message):
     await message.answer(local('about', 'author'), parse_mode="HTML")
+
+
+@ag.dp.callback_query_handler(lambda c: c.data.startswith('btn_answer'), state=['*'])
+async def process_callback_btn_event(callback_query: types.CallbackQuery, state: FSMContext):
+    btn, params = callback_query.data.split('=')
+    user_id, event_id = params.split(':')
+    if 'btn_answer' == btn:
+        event = await read_event_from_db(int(event_id))
+        await chat_init(callback_query.message, callback_query.from_user.id, user_id, callback_query.from_user.username, event)
 
 
 @ag.dp.message_handler(content_types=types.ContentTypes.ANY)
