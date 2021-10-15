@@ -62,10 +62,12 @@ async def chat_communicate(message: types.Message, state: FSMContext):
         with ag.bot.with_token(token):
             if client:
                 kb = await get_chat_answer_name_keyboard(message.from_user.id, message.from_user.username, data['event'].name, data['event'].event_id)
-                await send_message(data['event'].owner_id, local('phrases', 'chat_client_write').format(event_title=data['event'].title, user_full_name=message.from_user.username, text=message.text), kb, message)
+                await ag.bot.send_message(data['event'].owner_id, local('phrases', 'chat_client_write').format(event_title=data['event'].title, user_full_name=message.from_user.username, text=text), reply_markup=kb)
+                #await send_message(data['event'].owner_id, local('phrases', 'chat_client_write').format(event_title=data['event'].title, user_full_name=message.from_user.username, text=text), kb, message)
             else:
                 kb = await get_chat_answer_keyboard(data['event'].owner_id, data['event'].event_id)
-                await send_message(data['user_id'], local('phrases', 'chat_service_write').format(event_name=data['event'].name, text=message.text), kb, message)
+                await ag.bot.send_message(data['user_id'], local('phrases', 'chat_service_write').format(event_name=data['event'].name, text=text), reply_markup=kb)
+                #await send_message(data['user_id'], local('phrases', 'chat_service_write').format(event_name=data['event'].name, text=text), kb, message)
 
 
 @ag.dp.message_handler(state=Chating.finish, content_types=types.ContentTypes.ANY)
